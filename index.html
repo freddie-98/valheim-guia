@@ -6,7 +6,7 @@
 <meta name="claude:viewport-fit-sides" content="cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="Valheim">
+<meta name="apple-mobile-web-app-title" content="Valheim Database">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="theme-color" content="#fafafa">
 <meta name="color-scheme" content="light dark">
@@ -15,7 +15,7 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icon-180.png">
 <link rel="icon" href="icon-180.png">
-<title>Guia de Valheim</title>
+<title>Valheim Database</title>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,700;9..144,800&family=Figtree:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root{--bg:#fafafa;--ink:#0e0e11;--mut:#8b8b95;--card:#f2f1f5;--trk:#e6e4ea;--mint:#58dca4;--fs:"Figtree",-apple-system,BlinkMacSystemFont,"SF Pro Text",system-ui,sans-serif;--ff:"Fraunces","New York",ui-serif,Georgia,serif;--cw:min(100vw,480px);--pad:20px;--surf:#fff;--act:#e8e6ee;--chv:#b9b7c1;--icg:#b3b1bb;--btnb:#0e0e11;--btnt:#fff;--sh:rgba(20,20,40,.06);--sh2:rgba(20,20,40,.09);--page:#dedce1;--tx2:#4d4d56;color-scheme:light}
@@ -119,12 +119,33 @@ textarea{display:block;width:100%;min-height:110px;padding:14px 16px;border:0;bo
 .seg{display:flex;gap:6px;padding:4px;background:var(--surf);border-radius:14px}
 .seg button{flex:1;min-height:42px;border:0;border-radius:11px;background:none;font:600 15px var(--fs);color:var(--mut)}
 .seg button.on{background:var(--ink);color:var(--bg)}
+.grid4{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:22px}
+.gt{position:relative;display:flex;flex-direction:column;justify-content:space-between;align-items:flex-start;gap:18px;min-height:150px;padding:18px;border:0;border-radius:26px;background:var(--card);text-align:left;overflow:hidden;transition:transform .15s,background-color .2s}
+.gt::after{content:"";position:absolute;left:18px;right:18px;bottom:0;height:4px;border-radius:4px 4px 0 0;background:var(--mint);opacity:.0;transition:opacity .2s}
+.gt:active{transform:scale(.97);background:var(--act)}
+.gt:active::after{opacity:1}
+.gi{width:56px;height:56px;border-radius:18px;background:var(--surf);display:flex;align-items:center;justify-content:center;color:var(--ink);box-shadow:0 1px 0 var(--sh),0 8px 20px var(--sh)}
+.gn{font:800 21px/1.1 var(--ff);letter-spacing:-.01em;color:var(--ink)}
+.gc{display:block;margin-top:5px;font:800 11px var(--fs);letter-spacing:.14em;text-transform:uppercase;color:var(--mut)}
+.gt>span:not(.gi){display:block}
+.sech{display:flex;align-items:baseline;justify-content:space-between}.lnk{border:0;background:none;color:var(--mut);font:600 15px var(--fs);padding:8px 0;min-height:44px}
+.para.mut{color:var(--mut);font-size:15px}
+body[data-v="home"] #nav{display:none}body[data-v="home"] .w{padding-top:calc(env(safe-area-inset-top) + 28px)}
+.empty{margin-top:28px;padding:40px 24px;border-radius:24px;background:var(--card);text-align:center;color:var(--mut)}.empty svg{color:var(--icg)}.empty p{margin:12px 0 6px;font:800 20px var(--ff);color:var(--ink)}.empty span{font-size:15px;line-height:1.45}
+.w{padding-top:calc(env(safe-area-inset-top) + 36px)}
+body[data-v="home"] .w{padding-top:calc(env(safe-area-inset-top) + 64px)}
+#det{padding-top:calc(env(safe-area-inset-top) + 36px)}
+#nav,.dnav{margin-bottom:20px}
+body[data-v="home"] #sub{margin-bottom:26px}
+body[data-v="home"] .grid4{margin-top:30px;gap:14px}
+body[data-v="home"] .gt{min-height:164px}
+body[data-v="home"] .sec{margin-top:40px}
 </style>
 
 </head>
 <body>
 <div class="w">
-<div id="nav"><button id="bk" aria-label="Voltar"></button><button id="pill" class="pill2" aria-label="Favoritos"></button></div>
+<div id="nav"><button id="bk" aria-label="Voltar"></button></div>
 <h1 id="ttl"></h1>
 <p id="sub"></p>
 <label class="sf" id="sfw"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg><input id="q" type="search" placeholder="Buscar item, receita, material…" autocomplete="off" autocorrect="off" autocapitalize="off" enterkeyhint="search" aria-label="Pesquisar"></label>
@@ -142,7 +163,7 @@ const D=[["Armas","Adaga de fogogelo","Forja Negra nv.4","1 Adaga Nord, 20 Ouros
 const $=s=>document.querySelector(s);
 const MAIN=["Armas","Armaduras","Comida","Poções","Materiais","Chefes","Biomas","Estações"];
 const OTHER=["Escudos","Munição","Conjuntos","Ferramentas","Itens e acessórios","Troféus","Dicas"];
-let fopen=false,cat="Todos",F={est:"",bio:"",hab:""},q="",uses=null,browse=false,sel=null,dopen=false,fav=ld("vh_fav",[]),notes=ld("vh_notes",{});
+let fopen=false,cat="Todos",F={tipo:"",est:"",bio:"",hab:""},q="",uses=null,browse=false,sel=null,dopen=false,fav=ld("vh_fav",[]),notes=ld("vh_notes",{});
 function ld(k,d){try{return JSON.parse(localStorage.getItem(k))||d}catch(e){return d}}
 function sv(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
 const nrm=s=>s.normalize("NFD").replace(/[̀-ͯ]/g,"").toLowerCase();
@@ -156,7 +177,10 @@ function sta(x){return CRAFT.includes(x[0])?x[2].split(" + ")[0].replace(/ nv\.\
 function bio(x){if(x[0]=="Materiais"||x[0]=="Troféus")return x[2].split(", ").filter(b=>BC[b]);if(x[0]=="Chefes")return BC[x[2]]?[x[2]]:[];if(x[0]=="Biomas")return BC[x[1]]?[x[1]]:[];return[]}
 function hab(x){if(x[0]!="Armas")return"";const m=x[4].match(/Habilidade: ([^·|]+)/);return m?m[1].trim():""}
 function col(x){const b=bio(x)[0];if(b)return BC[b];const s=sta(x);return s?(SCOL[s]||"#c0a070"):""}
-const FG=[["est","Estação",sta],["bio","Bioma",x=>bio(x)],["hab","Habilidade",hab]];
+const EQ=["Armas","Armaduras","Conjuntos","Escudos","Munição","Itens e acessórios"];
+const GR=[["Biomas","tree",["Biomas"]],["Materiais","gem",["Materiais"]],["Ferramentas","tool",["Ferramentas"]],["Equipamentos","sword",EQ]];
+const GN=n=>(GR.find(g=>g[0]==n)||[0,0,[]])[2].reduce((s,c)=>s+(NC[c]||0),0);
+const FG=[["tipo","Tipo",x=>x[0]],["est","Estação",sta],["bio","Bioma",x=>bio(x)],["hab","Habilidade",hab]];
 const has=(v,f)=>Array.isArray(v)?v.includes(f):v==f;
 const IC={
 sword:'<path d="M5 19l9-9M14 10l5-5-1-2-2-1-5 5M4 20l2-2M7 17l2 2"/>',
@@ -191,7 +215,7 @@ const P2E={};D.forEach(x=>{if(x[5])P2E[x[1]]=nk(x[5])});
 const imgOf=k=>k&&ICONS[k]?ICONS[k]:null;
 const svg0=(x,s)=>`<svg class="ic" width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${IC[ik(x)]}</svg>`;
 const svg=(x,s)=>{const u=imgOf(nk(x[5]));return u?`<img class="ic" src="${u}" width="${s}" height="${s}" alt="">`:svg0(x,s)};
-function inCat(x){return cat=="Todos"||(cat=="★ Favoritos"?fav.includes(x[1]):x[0]==cat)}
+function inCat(x){const g=GR.find(g=>g[0]==cat);return cat=="Todos"||(cat=="★ Favoritos"?fav.includes(x[1]):g?g[2].includes(x[0]):x[0]==cat)}
 function matches(){
  const toks=nrm(q).split(/\s+/).filter(Boolean);
  let ur=null;if(uses){const e=uses.replace(/[.*+?^${}()|[\]\\]/g,"\\$&");ur=new RegExp("(^|, |: |\\) )\\d+ "+e+"(,|$)")}
@@ -211,7 +235,8 @@ mq.addEventListener&&mq.addEventListener("change",applyTheme);applyTheme();
 const CHV='<svg class="chv" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>';
 const BACK='<svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 14L4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 010 11H11"/></svg>';
 $("#bk").innerHTML=BACK;
-let tabSet=false,hist=[],lastDet="";
+let tabSet=false,hist=[],lastDet="",recent=ld("vh_recent",[]);
+function addRecent(n){recent=[n,...recent.filter(r=>r!=n)].slice(0,8);sv("vh_recent",recent)}
 const find=n=>D.find(x=>x[1]==n);
 function meta(x){if(x[0]=="Biomas")return x[2];const b=bio(x);if(b.length)return b[0]+(b.length>1?" +"+(b.length-1):"");return sta(x)||x[2]}
 function ings(r){const m=r.match(/^(.*?: )?(\d+ .+)$/);if(!m)return null;const ps=m[2].split(", ");if(!ps.every(p=>/^\d+ \S/.test(p)))return null;return{pre:(m[1]||"").replace(/: $/,""),it:ps.map(p=>{const k=p.match(/^(\d+) (.+)$/);return[+k[1],k[2]]})}}
@@ -241,29 +266,31 @@ function detail(x){
 function setH(){
  return `<h2 class="sec">Aparência</h2><div class="seg">${[["auto","Automático"],["light","Claro"],["dark","Escuro"]].map(([v,l])=>`<button data-th="${v}" class="${theme==v?"on":""}">${l}</button>`).join("")}</div>
  <h2 class="sec">Ícones do jogo</h2><div class="card p"><p>Importe imagens de ícones que você já tenha. Elas ficam guardadas só neste aparelho.</p><button class="btn" data-act="imp">Importar ícones</button><div id="impst" class="mut"></div></div>
- <h2 class="sec">Usar como app no iPhone</h2><div class="card p"><ol><li>Abra este guia no <b>Safari</b>.</li><li>Toque em <b>Compartilhar</b> (o quadrado com a seta).</li><li>Escolha <b>Adicionar à Tela de Início</b>.</li></ol><p class="mut">Ele abre em tela cheia, como um app.</p></div>
  <h2 class="sec">Sobre</h2><div class="tbl kvt"><div class="kv"><span class="il">Itens</span><b>${D.length}</b></div><div class="kv"><span class="il">Favoritos</span><b>${fav.length}</b></div></div>`}
 function render(keep){
  const saved=keep?[...document.querySelectorAll("#body .tabs")].map(t=>t.scrollLeft):null;
  const isHome=!q.trim()&&cat=="Todos"&&!uses&&!browse&&!tabSet;
- const view=tabSet?"set":isHome?"home":"list";
+ const isFav=cat=="★ Favoritos"&&!tabSet&&!uses&&!q.trim();
+ const view=tabSet?"set":isFav?"fav":isHome?"home":"list";
  const cur=dopen&&sel?find(sel):null;if(!cur)dopen=false;
  const B=document.body;B.dataset.v=view;B.dataset.d=dopen?"1":"0";document.documentElement.style.overflow=dopen?"hidden":"";
  $("#bk").style.visibility=view=="home"?"hidden":"visible";
- $("#pill").textContent="★ "+fav.length;
- $("#ttl").textContent=view=="home"?"Valheim":view=="set"?"Ajustes":uses?"Onde é usado":cat=="Todos"?(q.trim()?"Busca":"Todos os itens"):cat.replace("★ ","");
+ $("#ttl").textContent=view=="home"?"Valheim Database":view=="set"?"Ajustes":view=="fav"?"Favoritos":uses?"Onde é usado":cat=="Todos"?(q.trim()?"Busca":"Todos os itens"):cat.replace("★ ","");
  $("#sub").textContent=view=="home"?"Seu guia de bolso: itens, receitas e onde encontrar tudo.":"";
  $("#sub").style.display=view=="home"?"":"none";
- $("#sfw").style.display=view=="set"?"none":"";
- document.querySelectorAll("#tb button").forEach(b=>b.classList.toggle("on",b.dataset.tab==(view=="set"?"set":cat=="★ Favoritos"&&view=="list"?"fav":"home")));
- const cl=["Todos",...MAIN,...OTHER].filter(c=>c=="Todos"||NC[c]);
+ $("#sfw").style.display=view=="set"||view=="fav"?"none":"";
+ document.querySelectorAll("#tb button").forEach(b=>b.classList.toggle("on",b.dataset.tab==(view=="set"?"set":view=="fav"?"fav":"home")));
+ const cl=["Todos",...GR.map(g=>g[0])];
  let h="";
  if(view=="home"){
-  const mx=Math.max(...cl.slice(1).map(c=>NC[c]));
-  h+=tabsH(cl.map(c=>[c,c]),"","data-c",1);
-  h+=`<h2 class="sec">Categorias</h2><div class="bars">`+cl.slice(1).map(c=>`<button class="bar" data-c="${esc(c)}"><i style="width:${Math.max(16,NC[c]/mx*100)}%"></i><span>${esc(c)}</span><b>${NC[c]}</b></button>`).join("")+`</div>`;
-  h+=`<h2 class="sec">Atalhos</h2><div class="tbl">`+["Evolução das estações","Progressão geral","Comida e vida"].map(n=>`<button class="lr" data-sh="${esc(n)}"><span class="ln">${esc(n)}</span><span></span>${CHV}</button>`).join("")+`</div>`}
+  h+=`<div class="grid4">`+GR.map(([n,ic,cs])=>`<button class="gt" data-c="${esc(n)}"><span class="gi"><svg viewBox="0 0 24 24" width="34" height="34" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${IC[ic]}</svg></span><span class="gn">${esc(n)}</span></button>`).join("")+`</div>`;
+  const rc=recent.map(find).filter(Boolean);
+  h+=`<div class="sech"><h2 class="sec">Recentes</h2>${rc.length?'<button class="lnk" data-clr="1">Limpar</button>':""}</div>`+(rc.length?`<div class="tbl">`+rc.map(x=>`<button class="lr" style="--c:${col(x)||"transparent"}" data-n="${esc(x[1])}"><span class="ln">${icoCell(x,20)}<span>${esc(x[1])}</span></span><span class="lv">${esc(meta(x))}</span>${CHV}</button>`).join("")+`</div>`:`<div class="para mut">Os itens que você abrir aparecem aqui.</div>`)}
  else if(view=="set")h+=setH();
+ else if(view=="fav"){
+  const fl=[...fav].reverse().map(find).filter(Boolean);
+  h+=fl.length?`<div class="cnt">${fl.length} ${fl.length==1?"item favorito":"itens favoritos"}</div><div class="tbl">`+fl.map(x=>`<button class="lr" style="--c:${col(x)||"transparent"}" data-n="${esc(x[1])}"><span class="ln">${icoCell(x,20)}<span>${esc(x[1])}</span></span><span class="lv">${esc(meta(x))}</span>${CHV}</button>`).join("")+`</div>`
+   :`<div class="empty"><svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3.5l2.6 5.4 5.9.8-4.3 4.1 1 5.9-5.2-2.8-5.2 2.8 1-5.9-4.3-4.1 5.9-.8z"/></svg><p>Nenhum favorito ainda.</p><span>Abra um item e toque em <b>☆ Favoritar</b> para guardá-lo aqui.</span></div>`}
  else{
   const r=matches();const pool=D.filter(x=>cat=="Todos"?true:inCat(x));
   if(!uses)h+=tabsH(cl.map(c=>[c,c]),cat,"data-c",1);
@@ -273,25 +300,24 @@ function render(keep){
  $("#body").innerHTML=h;wire(keep,saved);
  if(view=="set")status();
  const dh=cur?detail(cur):"";if(dh!==lastDet){$("#det").innerHTML=dh;lastDet=dh}}
-function reset(){browse=false;q="";cat="Todos";F={est:"",bio:"",hab:""};uses=null;sel=null;dopen=false;tabSet=false;hist=[];$("#q").value="";render();window.scrollTo(0,0)}
-function open(n,h){if(!h)hist=[];sel=n;dopen=true;lastDet="";render();$("#det").scrollTop=0}
+function reset(){browse=false;q="";cat="Todos";F={tipo:"",est:"",bio:"",hab:""};uses=null;sel=null;dopen=false;tabSet=false;hist=[];$("#q").value="";render();window.scrollTo(0,0)}
+function open(n,h){if(!h)hist=[];addRecent(n);sel=n;dopen=true;lastDet="";render();$("#det").scrollTop=0}
 $("#q").oninput=e=>{q=e.target.value;dopen=false;tabSet=false;uses=null;if(cat=="★ Favoritos")cat="Todos";render()};
 $("#q").onkeydown=e=>{if(e.key=="Enter"){if(!q.trim()){browse=true;tabSet=false;render()}e.target.blur()}};
 document.addEventListener("click",e=>{
  const th=e.target.closest("[data-th]");if(th){theme=th.dataset.th;sv("vh_theme",theme);applyTheme();render(true);return}
- const t=e.target.closest("[data-c],[data-f],[data-n],[data-go],[data-u],[data-s],[data-tab],[data-act],[data-sh],#dback,#bk,#pill,#cu");if(!t)return;const d=t.dataset;
- if(d.c!==undefined){cat=d.c;F={est:"",bio:"",hab:""};uses=null;sel=null;dopen=false;tabSet=false;if(cat=="Todos"&&!q.trim())browse=true;render();window.scrollTo(0,0)}
+ const t=e.target.closest("[data-c],[data-f],[data-n],[data-go],[data-u],[data-s],[data-tab],[data-act],[data-sh],[data-clr],#dback,#bk,#cu");if(!t)return;const d=t.dataset;
+ if(d.c!==undefined){cat=d.c;F={tipo:"",est:"",bio:"",hab:""};uses=null;sel=null;dopen=false;tabSet=false;if(cat=="Todos"&&!q.trim())browse=true;render();window.scrollTo(0,0)}
  else if(d.f!==undefined){F[d.g]=d.f;render(true)}
  else if(d.n!==undefined)open(d.n);
- else if(d.sh!==undefined)open(d.sh);
- else if(d.go!==undefined){hist.push(sel);sel=d.go;lastDet="";render();$("#det").scrollTop=0}
+ else if(d.clr!==undefined){recent=[];sv("vh_recent",recent);render(true)}
+ else if(d.go!==undefined){hist.push(sel);sel=d.go;addRecent(d.go);lastDet="";render();$("#det").scrollTop=0}
  else if(d.u!==undefined){uses=d.u;sel=null;dopen=false;hist=[];cat="Todos";tabSet=false;render();window.scrollTo(0,0)}
  else if(d.s!==undefined){const n=d.s;fav=fav.includes(n)?fav.filter(f=>f!=n):[...fav,n];sv("vh_fav",fav);render(true)}
- else if(d.tab!==undefined){if(d.tab=="home")reset();else if(d.tab=="fav"){q="";$("#q").value="";cat="★ Favoritos";F={est:"",bio:"",hab:""};uses=null;sel=null;dopen=false;tabSet=false;render();window.scrollTo(0,0)}else{tabSet=true;dopen=false;render();window.scrollTo(0,0)}}
+ else if(d.tab!==undefined){if(d.tab=="home")reset();else if(d.tab=="fav"){q="";$("#q").value="";cat="★ Favoritos";F={tipo:"",est:"",bio:"",hab:""};uses=null;sel=null;dopen=false;tabSet=false;render();window.scrollTo(0,0)}else{tabSet=true;dopen=false;render();window.scrollTo(0,0)}}
  else if(d.act=="imp")$("#fi").click();
  else if(t.id=="dback"){if(hist.length)sel=hist.pop();else dopen=false;lastDet="";render()}
  else if(t.id=="bk"){if(tabSet){tabSet=false;render()}else reset()}
- else if(t.id=="pill"){document.querySelector('#tb [data-tab="fav"]').click()}
  else if(t.id=="cu"){uses=null;sel=null;render()}});
 $("#det").oninput=e=>{const n=e.target.dataset.t;if(n){notes[n]=e.target.value;sv("vh_notes",notes)}};
 render();
