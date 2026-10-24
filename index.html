@@ -140,6 +140,8 @@ body[data-v="home"] #sub{margin-bottom:26px}
 body[data-v="home"] .grid4{margin-top:30px;gap:14px}
 body[data-v="home"] .gt{min-height:164px}
 body[data-v="home"] .sec{margin-top:40px}
+body[data-o="1"] #body{margin-top:22px}
+.il small{display:block;margin-top:2px;font:800 10px var(--fs);letter-spacing:.14em;color:var(--mut)}.ir.boss .il{color:var(--ink)}.ir.boss .ib i{background:#ff8a5c}.ir.mo{cursor:default}
 </style>
 
 </head>
@@ -249,11 +251,41 @@ function wire(keep,saved){document.querySelectorAll("#body .tabw").forEach((w,i)
 function icoCell(x,s){const u=imgOf(nk(x[5]));return u?`<img class="ic" src="${u}" width="${s}" height="${s}" alt="">`:svg0(x,s)}
 function pillsH(x){const b=bio(x);if(b.length)return b.map(n=>`<span class="pill" style="--c:${BC[n]}">${esc(n)}</span>`).join("");const c=col(x);return c&&x[2]?`<span class="pill" style="--c:${c}">${esc(x[2])}</span>`:""}
 function kvRows(rows){return rows.map(l=>{const m=l.match(/^([^:]{1,34}): (.+)$/);return m?`<div class="kv${m[2].length>30?" st":""}"><span class="il">${esc(m[1])}</span><b>${esc(m[2])}</b></div>`:`<div class="kv one">${esc(l)}</div>`}).join("")}
+
+const MON={
+"Prado":[["Cervo","Deer",10,"passivo"],["Neck","Neck",5],["Javali","Boar",10],["Cinzento","Greyling",20],["Eikthyr","Eikthyr",500,"chefe"]],
+"Floresta Negra":[["Esqueleto","Skeleton",40],["Anão cinzento","Greydwarf",40],["Xamã anão cinzento","Greydwarf Shaman",60],["Fantasma","Ghost",60],["Restos rançosos","Rancid Remains",100],["Bruto anão cinzento","Greydwarf Brute",150],["Troll","Troll",600],["Urso","Bear",800],["O Ancião","The Elder",2500,"chefe"]],
+"Pântano":[["Surtling","Surtling",20],["Bolha","Blob",50],["Sanguessuga","Leech",60],["Draugr","Draugr",100],["Espectro","Wraith",100],["Bolha viscosa","Oozer",150],["Draugr de elite","Draugr Elite",200],["Kvastur","Kvastur",700],["Abominação","Abomination",800],["Massa Óssea","Bonemass",5000,"chefe"]],
+"Montanha":[["Morcego","Bat",10],["Ulv","Ulv",50],["Lobo","Wolf",80],["Drake","Drake",100],["Cultista","Cultist",200],["Fenring","Fenring",300],["Golem de pedra","Stone Golem",800],["Moder","Moder",7500,"chefe"]],
+"Planícies":[["Mosquito da morte","Deathsquito",10],["Xamã fuling","Fuling Shaman",100],["Growth","Growth",100],["Fuling","Fuling",175],["Fuling berserker","Fuling Berserker",800],["Lox","Lox",1000],["Vile","Vile",1200],["Yagluth","Yagluth",10000,"chefe"]],
+"Terras Nevoadas":[["Ninhada de buscador","Seeker Brood",20],["Carrapato","Tick",50],["Buscador","Seeker",200],["Dvergr ladino","Dvergr Rogue",350],["Dvergr mago","Dvergr Mage",350],["Soldado buscador","Seeker Soldier",1500],["Gjall","Gjall",1500],["A Rainha","The Queen",12500,"chefe"]],
+"Terras de Cinzas":[["Atirador carbonizado","Charred Marksman",200],["Volture","Volture",200],["Contorcionista carbonizado","Charred Twitcher",220],["Bolha de lava","Lava Blob",300],["Skugg","Skugg",400],["Bruxo carbonizado","Charred Warlock",600],["Guerreiro carbonizado","Charred Warrior",600],["Asksvin","Asksvin",800],["Bonemaw","Bonemaw",1100],["Valquíria caída","Fallen Valkyrie",1500],["Morgen","Morgen",1600],["Fader","Fader",25000,"chefe"]],
+"Norte Profundo":[["Pulp minúsculo","Tiny Pulp",null],["Pulp amorfo","Shapeless Pulp",null],["Pulp hexaédrico","Hexahedric Pulp",null],["Eyeless One","Eyeless One",null],["Barka","Barka",null],["Hexen","Hexen",null],["Writhan","Writhan",null],["Krigen","Krigen",null],["Elaking","Elaking",null],["Guerreiro caído","Fallen Warrior",null],["Gammeltroll","Gammeltroll",null],["Kall Fimbulbringer","Kall Fimbulbringer",null,"chefe"]]};
+function biomeItems(B){
+ const ms=MON[B]||[];const al={};ms.forEach(m=>{al[nrm(m[0])]=m;al[nrm(m[1])]=m});
+ const out=[];
+ D.forEach(x=>{if(x[0]!="Materiais")return;
+  let best=null;const put=(c,hp,t)=>{if(!best||c<best[0]||(c==best[0]&&hp<best[1]))best=[c,hp,t]};
+  const co=x[4].match(/Coleta: ([^|]+)/);
+  if(co)co[1].split("; ").forEach(p=>{const m=p.match(/^(\S+) .*\(([^)]*)\)$/);if(m&&m[2].split(", ").includes(B)){const v=m[1];put(v=="Minerar"?2:1,0,v)}});
+  const dr=x[4].match(/Cai de: ([^|]+)/);
+  if(dr)dr[1].split(", ").forEach(p=>{const n=nrm(p.replace(/ \d+%$/,"").trim());const m=al[n];if(m)put(3,m[2]==null?1e9:m[2],"Dropa de "+m[0])});
+  if(best)out.push({x,c:best[0],hp:best[1],t:best[2]})});
+ out.sort((a,b)=>a.c-b.c||a.hp-b.hp||a.x[1].localeCompare(b.x[1],"pt"));return out}
+function biomeH(x){
+ const B=x[1],ms=(MON[B]||[]).map((m,i)=>[m[0],m[1],m[2],typeof m[3]=="string"?m[3]:"",i]).sort((a,b)=>(a[2]==null||b[2]==null)?a[4]-b[4]:a[2]-b[2]||a[4]-b[4]),mx=Math.max(...ms.map(m=>m[2]||0),1);
+ let h=`<h2 class="sec">Monstros</h2><div class="cap">Do mais fraco ao mais forte${B=="Norte Profundo"?" (ordem estimada: ainda sem dados de vida)":", pela vida de cada um"}</div><div class="tbl">`;
+ h+=ms.map(m=>`<div class="ir mo${m[3]=="chefe"?" boss":""}"><span class="il">${esc(m[0])}${m[3]?`<small>${m[3]=="chefe"?"Chefe":"Passivo"}</small>`:""}</span><b class="iq">${m[2]==null?"?":m[2]}</b><span class="ib"><i style="width:${m[2]==null?0:Math.max(5,Math.log(m[2]+1)/Math.log(mx+1)*100)}%"></i></span></div>`).join("")+`</div>`;
+ const it=biomeItems(B);
+ h+=`<h2 class="sec">Itens do bioma</h2><div class="cap">Do mais fácil ao mais difícil de conseguir: primeiro o que se coleta, depois o que se minera, depois o que cai de monstros (dos mais fracos aos mais fortes)</div>`;
+ h+=it.length?`<div class="tbl">`+it.map(o=>`<button class="lr" style="--c:${col(o.x)||"transparent"}" data-go="${esc(o.x[1])}"><span class="ln">${icoCell(o.x,20)}<span>${esc(o.x[1])}</span></span><span class="lv">${esc(o.t)}</span>${CHV}</button>`).join("")+`</div>`:`<div class="para mut">Sem itens registrados.</div>`;
+ return h}
 function detail(x){
  const isTip=x[0]=="Dicas";let h="";
  const I=ings(x[3]);
  h+=`<div class="dnav"><button id="dback" aria-label="Voltar">${BACK}</button><button class="pill2" data-s="${esc(x[1])}">${fav.includes(x[1])?"★ Favorito":"☆ Favoritar"}</button></div>`;
  h+=`<div class="dic">${icoCell(x,34)}</div><h1 class="dt">${esc(x[1])}</h1><div class="dsub">${esc(x[0])}${x[5]?" · "+esc(x[5]):""}</div><div class="pills">${pillsH(x)}</div>`;
+ if(x[0]=="Biomas")return h+biomeH(x)+`<h2 class="sec">Notas</h2><textarea data-t="${esc(x[1])}" placeholder="Escreva aqui suas anotações…">${esc(notes[x[1]]||"")}</textarea>`;
  if(isTip)h+=`<p class="lead">${esc(x[3])}</p>`;
  else if(I){const mx=Math.max(...I.it.map(a=>a[0]));
   h+=`<h2 class="sec">Requisitos</h2>${I.pre?`<div class="cap">${esc(I.pre)}</div>`:""}<div class="tbl">`+I.it.map(([q,n])=>{const g=find(n);return `<${g?"button data-go=\""+esc(n)+"\"":"div"} class="ir${g?" lk":""}"><span class="il">${esc(n)}</span><b class="iq">${q}</b><span class="ib"><i style="width:${Math.max(8,q/mx*100)}%"></i></span></${g?"button":"div"}>`}).join("")+`</div>`}
@@ -271,14 +303,15 @@ function render(keep){
  const saved=keep?[...document.querySelectorAll("#body .tabs")].map(t=>t.scrollLeft):null;
  const isHome=!q.trim()&&cat=="Todos"&&!uses&&!browse&&!tabSet;
  const isFav=cat=="★ Favoritos"&&!tabSet&&!uses&&!q.trim();
+ const only=cat=="Biomas"&&!tabSet&&!uses&&!q.trim();
  const view=tabSet?"set":isFav?"fav":isHome?"home":"list";
  const cur=dopen&&sel?find(sel):null;if(!cur)dopen=false;
- const B=document.body;B.dataset.v=view;B.dataset.d=dopen?"1":"0";document.documentElement.style.overflow=dopen?"hidden":"";
+ const B=document.body;B.dataset.v=view;B.dataset.d=dopen?"1":"0";B.dataset.o=only?"1":"0";document.documentElement.style.overflow=dopen?"hidden":"";
  $("#bk").style.visibility=view=="home"?"hidden":"visible";
  $("#ttl").textContent=view=="home"?"Valheim Database":view=="set"?"Ajustes":view=="fav"?"Favoritos":uses?"Onde é usado":cat=="Todos"?(q.trim()?"Busca":"Todos os itens"):cat.replace("★ ","");
  $("#sub").textContent=view=="home"?"Seu guia de bolso: itens, receitas e onde encontrar tudo.":"";
  $("#sub").style.display=view=="home"?"":"none";
- $("#sfw").style.display=view=="set"||view=="fav"?"none":"";
+ $("#sfw").style.display=view=="set"||view=="fav"||only?"none":"";
  document.querySelectorAll("#tb button").forEach(b=>b.classList.toggle("on",b.dataset.tab==(view=="set"?"set":view=="fav"?"fav":"home")));
  const cl=["Todos",...GR.map(g=>g[0])];
  let h="";
@@ -292,10 +325,11 @@ function render(keep){
   h+=fl.length?`<div class="cnt">${fl.length} ${fl.length==1?"item favorito":"itens favoritos"}</div><div class="tbl">`+fl.map(x=>`<button class="lr" style="--c:${col(x)||"transparent"}" data-n="${esc(x[1])}"><span class="ln">${icoCell(x,20)}<span>${esc(x[1])}</span></span><span class="lv">${esc(meta(x))}</span>${CHV}</button>`).join("")+`</div>`
    :`<div class="empty"><svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3.5l2.6 5.4 5.9.8-4.3 4.1 1 5.9-5.2-2.8-5.2 2.8 1-5.9-4.3-4.1 5.9-.8z"/></svg><p>Nenhum favorito ainda.</p><span>Abra um item e toque em <b>☆ Favoritar</b> para guardá-lo aqui.</span></div>`}
  else{
-  const r=matches();const pool=D.filter(x=>cat=="Todos"?true:inCat(x));
-  if(!uses)h+=tabsH(cl.map(c=>[c,c]),cat,"data-c",1);
-  if(!uses&&cat!="Todos"&&cat!="★ Favoritos")h+=FG.map(([k,l,fn])=>{const o=[...new Set(pool.flatMap(x=>{const v=fn(x);return Array.isArray(v)?v:[v]}).filter(Boolean))].sort((a,b)=>a.localeCompare(b,"pt"));return o.length>1?`<div class="fl2">${l}</div>`+tabsH([["","Todas"],...o.map(f=>[f,f])],F[k]||"","data-f",0,` data-g="${k}"`):""}).join("");
-  h+=`<div class="cnt">${uses?`Usado em ${r.length} receita(s)`:r.length+(r.length==1?" resultado":" resultados")}${uses?` <button id="cu" class="pill2">✕ limpar</button>`:""}</div>`;
+  const BO=["Prado","Floresta Negra","Pântano","Montanha","Planícies","Terras Nevoadas","Terras de Cinzas","Norte Profundo"];
+  const r=matches();if(cat=="Biomas")r.sort((a,b)=>BO.indexOf(a[1])-BO.indexOf(b[1]));const pool=D.filter(x=>cat=="Todos"?true:inCat(x));
+  if(!uses&&!only)h+=tabsH(cl.map(c=>[c,c]),cat,"data-c",1);
+  if(!uses&&!only&&cat!="Todos"&&cat!="★ Favoritos")h+=FG.map(([k,l,fn])=>{const o=[...new Set(pool.flatMap(x=>{const v=fn(x);return Array.isArray(v)?v:[v]}).filter(Boolean))].sort((a,b)=>a.localeCompare(b,"pt"));return o.length>1?`<div class="fl2">${l}</div>`+tabsH([["","Todas"],...o.map(f=>[f,f])],F[k]||"","data-f",0,` data-g="${k}"`):""}).join("");
+  if(!only)h+=`<div class="cnt">${uses?`Usado em ${r.length} receita(s)`:r.length+(r.length==1?" resultado":" resultados")}${uses?` <button id="cu" class="pill2">✕ limpar</button>`:""}</div>`;
   h+=r.length?`<div class="tbl">`+r.map(x=>`<button class="lr" style="--c:${col(x)||"transparent"}" data-n="${esc(x[1])}"><span class="ln">${icoCell(x,20)}<span>${esc(x[1])}</span></span><span class="lv">${esc(meta(x))}</span>${CHV}</button>`).join("")+`</div>`:`<div class="para">${cat=="★ Favoritos"?"Toque em ☆ Favoritar dentro de um item para guardá-lo aqui.":"Nada encontrado. Tente outra palavra ou categoria."}</div>`}
  $("#body").innerHTML=h;wire(keep,saved);
  if(view=="set")status();
